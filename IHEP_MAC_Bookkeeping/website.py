@@ -2136,7 +2136,7 @@ def packaging_modules(username):
             IHEP MAC Checklist Website"""
 
 
-        if len(finished_modules) >= 20:
+        if len(finished_modules) >= 1:
             if st.button("Notify Packaging Team"):
                 send_email_notification(
                     group_name="Packaging",
