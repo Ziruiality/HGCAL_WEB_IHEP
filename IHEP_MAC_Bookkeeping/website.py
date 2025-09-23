@@ -8,7 +8,12 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 import numpy as np
+import qrcode
+from PIL import Image, ImageDraw, ImageFont
+import io
+
 from mail_notification import send_email_notification
+
 
 PACKAGED_CSV = "data/packaged_modules.csv"
 
@@ -2162,7 +2167,174 @@ def packaging_modules(username):
     except FileNotFoundError:
         st.error("output.csv was not found. Please check the file path.")
 
+def print_QR(username): 
+    try:
+        finished_df = pd.read_csv("data/output.csv")
+
+        if finished_df.empty:
+            st.header("No finished module found.")
+            return
+
+        # Group by module-related fields and check if all steps have 'green' flags
+        grouped = finished_df.groupby(['Module Number', 'Sensor ID', 'Hexboard Number', 'Baseplate Number', 'Remeasurement Number'])
+        finished_modules = []
+
+        for group_name, group_data in grouped:
+            module_number = group_name[0]
+            
+            if all(group_data['Flag'] == 'green'):  # Check if all steps have green flags
+                comment = group_data.iloc[0]['Comment'] if not group_data.empty else None
+                finished_modules.append({
+                    'Module Number': module_number,
+                    'Sensor ID': group_name[1],
+                    'Hexboard Number': group_name[2],
+                    'Baseplate Number': group_name[3],
+                    'Remeasurement Number': group_name[4],
+                    'Comment': comment
+                })
+
+        if not finished_modules:
+            st.info("No finished modules found.")
+            return
+
+        # Convert to DataFrame
+        finished_table = pd.DataFrame(finished_modules)
+        finished_table.index = range(1, len(finished_table) + 1)
+
+        # Display finished modules
+        st.write("## Finished Modules (Ready for Printing QR code)")
+        st.write(finished_table)
+        st.info("Those modules have all steps finished. Please select 6 modules and print QR label.")
+
+        selected_modules = st.multiselect("Select modules for printing QR labels:", finished_table["Module Number"].tolist())
+
+        # Check if exactly 6 modules are selected
+        if len(selected_modules) == 6:
+            if st.button("Generate QR Code Label"):
+                # Create the QR code label
+                create_qr_label(selected_modules, finished_table)
+        elif len(selected_modules) > 6:
+            st.warning("Please select exactly 6 modules for printing.")
+        else:
+            st.info(f"Please select 6 modules. Currently selected: {len(selected_modules)}")
+
+
+    except pd.errors.EmptyDataError:
+        st.header("No finished modules found.")
+    except FileNotFoundError:
+        st.error("output.csv was not found. Please check the file path.")
 ###################################################################################################################################################################
+
+def create_qr_label(module_numbers, finished_table):
+    # Page dimensions (80mm x 60mm) converted to pixels at 300 DPI
+    width, height = 945, 709  # 80mm * 300/25.4 ≈ 945, 60mm * 300/25.4 ≈ 709
+    
+    # Create a blank image with white background
+    img = Image.new('RGB', (width, height), 'white')
+    draw = ImageDraw.Draw(img)
+    
+    font = ImageFont.load_default(30)
+    date_font = ImageFont.load_default(30)
+    
+    # Calculate QR code size and positions for 3x2 grid
+    qr_size = 200  # QR code size in pixels
+    margin = 20  # Margin between QR codes
+    
+    # Calculate positions for 3 columns and 2 rows
+    positions = []
+    for row in range(3):
+        for col in range(2):
+            if col == 0:
+                x =  margin + 130
+            else:
+                x = width - qr_size - margin - 130
+            y = row * (qr_size + margin) + margin
+            positions.append((x, y))
+    
+   # Add logo and date in the center of the page
+    try:
+        logo = Image.open("IHEP_MAC_Bookkeeping/ihep_logo.png")
+        logo_width, logo_height = logo.size
+        logo_x = (width - logo_width) // 2
+        logo_y = (height - logo_height) // 2 - 50  # Place logo above the date
+        img.paste(logo, (logo_x, logo_y))
+    except FileNotFoundError:
+        st.warning("Logo file 'IHEP.png' not found. Skipping logo.")
+
+    # Add date in the center of the page
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    date_bbox = draw.textbbox((0, 0), current_date, font=date_font)
+    date_width = date_bbox[2] - date_bbox[0]
+    date_height = date_bbox[3] - date_bbox[1]
+    date_x = (width - date_width) // 2
+    date_y = (height - date_height) // 2 + 50   # Center vertically
+    draw.text((date_x, date_y), current_date, fill="black", font=date_font)
+    
+    # Generate and place QR codes
+    for i, module_num in enumerate(module_numbers):
+        if i >= 6:  # Only process first 6 modules
+            break
+            
+        # Get module data
+        module_data = finished_table[finished_table['Module Number'] == module_num].iloc[0]
+        
+        # Create QR code content
+        qr_content = f"{module_data['Module Number']}\n"
+        #qr_content = f"Module: {module_data['Module Number']}\n"
+        #qr_content += f"Sensor: {module_data['Sensor ID']}\n"
+        #qr_content += f"Hexboard: {module_data['Hexboard Number']}\n"
+        #qr_content += f"Baseplate: {module_data['Baseplate Number']}\n"
+        #qr_content += f"Remeasure: {module_data['Remeasurement Number']}\n"
+        if module_data['Comment'] and pd.notna(module_data['Comment']):
+            qr_content += f"Comment: {module_data['Comment']}"
+        
+        # Generate QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=5,
+            border=2,
+        )
+        qr.add_data(qr_content)
+        qr.make(fit=True)
+        
+        qr_img = qr.make_image(fill_color="black", back_color="white").resize((qr_size, qr_size))
+        
+        # Paste QR code onto the label
+        img.paste(qr_img, positions[i])
+        
+        # Add module number below QR code
+        text = f"{module_num[:6]}\n{module_num[6:]}"
+        text_bbox = draw.textbbox((0, 0), text, font=font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
+
+    
+        if i % 2 == 0:  # First column (left)
+            text_x = positions[i][0] - text_width - 10  # Place to the left of the QR code
+        else:  # Second column (right)
+            text_x = positions[i][0] + qr_size + 10  # Place to the right of the QR code
+
+        text_y = positions[i][1] + (qr_size - text_height) // 2  # Center vertically
+        draw.text((text_x, text_y), text, fill="black", font=font)
+
+
+    # Save the image to a bytes buffer
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+    
+    # Display the image in Streamlit
+    st.image(buf, caption="QR Code Label (80mm x 60mm)")
+    
+    # Add download button
+    st.download_button(
+        label="Download QR Code Label",
+        data=buf,
+        file_name=f"qr_label_{current_date}.png",
+        mime="image/png"
+    )
+
 
 def plot_selected_module():
     module_number = st.text_input("Enter Module Number")
@@ -2453,7 +2625,7 @@ def main():
 
 
 
-        option = st.sidebar.selectbox("", ("Home", "Module Assembly Check List", "Unfinished Modules", "Finished Modules", "Packaging Modules", "Module Status Summary"), key="option_select")  # Unique key for option select
+        option = st.sidebar.selectbox("", ("Home", "Module Assembly Check List", "Unfinished Modules", "Finished Modules", "Packaging Modules", "Print QR label","Module Status Summary"), key="option_select")  # Unique key for option select
         
         if option == "Home":
             home_page()
@@ -2465,6 +2637,8 @@ def main():
             show_finished_modules(username)
         if option == "Packaging Modules":
             packaging_modules(username)    
+        if option == "Print QR label":    
+            print_QR(username) 
         if option== "Module Status Summary":
             plot_choice = st.sidebar.radio("Select Plot Type:", ["Modules Summary", "Steps Over Time"])
             if plot_choice == "Steps Over Time":
