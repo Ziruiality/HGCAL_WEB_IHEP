@@ -2241,16 +2241,25 @@ def create_qr_label(module_numbers, finished_table):
     margin = 20  # Margin between QR codes
     
     # Calculate positions for 3 columns and 2 rows
-    positions = []
-    for row in range(3):
-        for col in range(2):
-            if col == 0:
-                x =  margin + 130
-            else:
-                x = width - qr_size - margin - 130
-            y = row * (qr_size + margin) + margin
-            positions.append((x, y))
-    
+    #positions = []
+    #for row in range(3):
+    #    for col in range(2):
+    #        if col == 0:
+    #            x =  margin + 130
+    #        else:
+    #            x = width - qr_size - margin - 130
+    #        y = row * (qr_size + margin) + margin
+    #        positions.append((x, y))
+    positions = [
+    (margin + 130, 2 * (qr_size + margin) + margin),  # 1-左下方
+    (width - qr_size - margin - 130, 2 * (qr_size + margin) + margin),  # 2-右下方
+    (margin + 130, 1 * (qr_size + margin) + margin),  # 3-左中
+    (width - qr_size - margin - 130, 1 * (qr_size + margin) + margin),  # 4-右中
+    (margin + 130, 0 * (qr_size + margin) + margin),  # 5-左上方
+    (width - qr_size - margin - 130, 0 * (qr_size + margin) + margin)  # 6-右上方
+    ]
+
+
    # Add logo and date in the center of the page
     try:
         logo = Image.open("IHEP_MAC_Bookkeeping/ihep_logo.png")
@@ -2279,14 +2288,14 @@ def create_qr_label(module_numbers, finished_table):
         module_data = finished_table[finished_table['Module Number'] == module_num].iloc[0]
         
         # Create QR code content
-        qr_content = f"{module_data['Module Number']}\n"
+        qr_content = f"{module_data['Module Number']}"
         #qr_content = f"Module: {module_data['Module Number']}\n"
         #qr_content += f"Sensor: {module_data['Sensor ID']}\n"
         #qr_content += f"Hexboard: {module_data['Hexboard Number']}\n"
         #qr_content += f"Baseplate: {module_data['Baseplate Number']}\n"
         #qr_content += f"Remeasure: {module_data['Remeasurement Number']}\n"
-        if module_data['Comment'] and pd.notna(module_data['Comment']):
-            qr_content += f"Comment: {module_data['Comment']}"
+        #if module_data['Comment'] and pd.notna(module_data['Comment']):
+            #qr_content += f"Comment: {module_data['Comment']}"
         
         # Generate QR code
         qr = qrcode.QRCode(
