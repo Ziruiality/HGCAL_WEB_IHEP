@@ -2227,7 +2227,7 @@ def print_QR(username):
 
 def create_qr_label(module_numbers, finished_table):
     # Page dimensions (80mm x 60mm) converted to pixels at 300 DPI
-    width, height = 945, 709  # 80mm * 300/25.4 ≈ 945, 60mm * 300/25.4 ≈ 709
+    width, height = 945, 472  # 80mm * 300/25.4 ≈ 945, 40mm * 300/25.4 ≈ 472
     
     # Create a blank image with white background
     img = Image.new('RGB', (width, height), 'white')
@@ -2237,18 +2237,18 @@ def create_qr_label(module_numbers, finished_table):
     date_font = ImageFont.load_default(30)
     
     # Calculate QR code size and positions for 3x2 grid
-    qr_size = 200  # QR code size in pixels
-    margin = 20  # Margin between QR codes
+    qr_size = 140  # QR code size in pixels
+    margin = 10  # Margin between QR codes
     
     # Calculate positions for 3 columns and 2 rows
 
     positions = [
-    (margin + 130, 2 * (qr_size + margin) + margin),  # 1-左下方
-    (width - qr_size - margin - 130, 2 * (qr_size + margin) + margin),  # 2-右下方
-    (margin + 130, 1 * (qr_size + margin) + margin),  # 3-左中
-    (width - qr_size - margin - 130, 1 * (qr_size + margin) + margin),  # 4-右中
-    (margin + 130, 0 * (qr_size + margin) + margin),  # 5-左上方
-    (width - qr_size - margin - 130, 0 * (qr_size + margin) + margin)  # 6-右上方
+    (margin + 160, 2 * (qr_size + margin) + margin),  # 1-左下方
+    (width - qr_size - margin - 160, 2 * (qr_size + margin) + margin),  # 2-右下方
+    (margin + 160, 1 * (qr_size + margin) + margin),  # 3-左中
+    (width - qr_size - margin - 160, 1 * (qr_size + margin) + margin),  # 4-右中
+    (margin + 160, 0 * (qr_size + margin) + margin),  # 5-左上方
+    (width - qr_size - margin - 160, 0 * (qr_size + margin) + margin)  # 6-右上方
     ]
 
    # Add logo and date in the center of the page
@@ -2329,7 +2329,7 @@ def create_qr_label(module_numbers, finished_table):
     buf.seek(0)
     
     # Display the image in Streamlit
-    st.image(buf, caption="QR Code Label (80mm x 60mm)")
+    st.image(buf, caption="QR Code Label (80mm x 40mm)")
     
     # Add download button
     st.download_button(
