@@ -47,10 +47,10 @@ STEPS = [
 "OGP After Assemble Sensor",
 "Assemble Hexaboard",
 "OGP After Assemble Hexaboard",
-"Live Module Electronic Test: Assembled",
+#"Live Module Electronic Test: Assembled",
 "Bonding",
-"OGP After Backside Bonding",
 "Live Module Electronic Test - Fully Bonded",
+"OGP After Backside Bonding",
 "Encapsolation",
 "OGP After Encapsolation",
 "Live Module Electronic Test - Fully Encapsulated"
@@ -96,8 +96,8 @@ ogp_after_assemble_hexaboard_flags = {
 }
 
 live_module_electronic_test_assembled_flags={
-    'Hexaboard electronic test: Assembled':'red',
-    'Pedestal run: Assembled':'red',
+    'Hexaboard electronic test: Assembled':'green',
+    'Pedestal run: Assembled':'green',
 }
 
 bonding_flags={
@@ -300,6 +300,10 @@ def initialize_session_state(module_number=None, sensor_id=None, hexboard_number
                 for step_ in flags:
                     flags[step_] = 'red'
 
+            for flags in [live_module_electronic_test_assembled_flags]:
+                for step_ in flags:
+                    flags[step_] = 'green'
+
             return True, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, None  # Default initialization completed
 
     else:
@@ -373,7 +377,7 @@ def Module_Assembly_Check_List(username):
                 Ogp_After_Assemble_Hexaboard_Icon = '\u2705' if Ogp_After_Assemble_Hexaboard_Flag == 'green' else '\u274C'
 
                 live_module_electronic_test_assembled_completed = all(flag == 'green' for flag in live_module_electronic_test_assembled_flags.values())
-                Live_Module_Electronic_Test_Assembled_Flag = 'green' if live_module_electronic_test_assembled_completed else 'red'
+                Live_Module_Electronic_Test_Assembled_Flag = 'green' # bypass if live_module_electronic_test_assembled_completed else 'red'
                 Live_Module_Electronic_Test_Assembled_Icon = '\u2705' if Live_Module_Electronic_Test_Assembled_Flag == 'green' else '\u274C'
 
                 bonding_completed = all(flag == 'green' for flag in bonding_flags.values())
@@ -418,10 +422,10 @@ def Module_Assembly_Check_List(username):
                         "OGP After Assemble Sensor",
                         "Assemble Hexaboard",
                         "OGP After Assemble Hexaboard",
-                        "Live Module Electronic Test: Assembled",
+                        #"Live Module Electronic Test: Assembled",
                         "Bonding",
-                        "OGP After Bonding",
                         "Live Module Electronic Test - Fully Bonded",
+                        "OGP After Bonding",
                         "Encapsolation",
                         "OGP After Encapsolation",
                         "Live Module Electronic Test - Fully Encapsulated"
@@ -435,10 +439,10 @@ def Module_Assembly_Check_List(username):
                         Ogp_After_Assemble_Sensor_Icon,
                         Assemble_Hexaboard_Icon,
                         Ogp_After_Assemble_Hexaboard_Icon,
-                        Live_Module_Electronic_Test_Assembled_Icon,
+                        #Live_Module_Electronic_Test_Assembled_Icon,
                         Bonding_Icon,
-                        Ogp_After_Backside_Bonding_Icon,
                         Live_Module_Electronic_Test_Fully_Bonded_Icon,
+                        Ogp_After_Backside_Bonding_Icon,
                         Module_Encapsolation_Icon,
                         Ogp_After_Module_Encapsolation_Icon,
                         Live_Module_Electronic_Test_Fully_Encapsulated_Icon
@@ -482,9 +486,9 @@ def Module_Assembly_Check_List(username):
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
                 OGP_After_Assemble_Hexaboard(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
-            elif option1 == "Live Module Electronic Test: Assembled":
-                success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
-                Live_Module_Electronic_Test_Assembled(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
+            #elif option1 == "Live Module Electronic Test: Assembled":
+                #success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
+                #Live_Module_Electronic_Test_Assembled(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
             elif option1 == "Bonding":
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
@@ -1287,7 +1291,7 @@ def Live_Module_Electronic_Test_Assembled(username, module_number, sensor_id, he
         st.table(df_steps)
 
     live_module_electronic_test_assembled_completed = all(flag == 'green' for flag in live_module_electronic_test_assembled_flags.values())
-    Live_Module_Electronic_Test_Assembled_Flag = 'green' if live_module_electronic_test_assembled_completed else 'red'
+    Live_Module_Electronic_Test_Assembled_Flag = 'green'#hard-coding to bypass this step if live_module_electronic_test_assembled_completed else 'red'
     Live_Module_Electronic_Test_Assembled_Icon = '\u2705' if Live_Module_Electronic_Test_Assembled_Flag == 'green' else '\u274C'
     st.header(f"Live Module Electronic Test: Assembled Check List: {Live_Module_Electronic_Test_Assembled_Icon}")
 
@@ -1399,8 +1403,8 @@ def Bonding(username, module_number, sensor_id, hexboard_number, baseplate_numbe
             "OGP After Assemble Hexaboard": ogp_after_assemble_hexaboard_flags,
             "Live Module Electronic Test - Assembled": live_module_electronic_test_assembled_flags,
             "Bonding": bonding_flags,
-            "OGP After Bonding": ogp_after_backside_bonding_flags,
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
+            "OGP After Bonding": ogp_after_backside_bonding_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
             "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
@@ -1454,7 +1458,8 @@ def Bonding(username, module_number, sensor_id, hexboard_number, baseplate_numbe
 
 def OGP_After_Backside_Bonding(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user):
     show_navigation_buttons()
-    previous_step_completed = all(flag == 'green' for flag in bonding_flags.values())
+
+    previous_step_completed = all(flag == 'green' for flag in live_module_electronic_test_fully_bonded_flags.values())
     previous_step_flag = 'green' if previous_step_completed else 'red'
 
     if previous_step_flag == 'red':
@@ -1549,8 +1554,9 @@ def OGP_After_Backside_Bonding(username, module_number, sensor_id, hexboard_numb
 ######################################################################################################################################
 def Live_Module_Electronic_Test_Fully_Bonded(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user):
     show_navigation_buttons()
-    previous_step_completed = all(flag == 'green' for flag in ogp_after_backside_bonding_flags.values())
+    previous_step_completed = all(flag == 'green' for flag in bonding_flags.values())
     previous_step_flag = 'green' if previous_step_completed else 'red'
+
 
     if previous_step_flag == 'red':
         st.write("Please finish the previous step first")
@@ -1645,7 +1651,8 @@ def Live_Module_Electronic_Test_Fully_Bonded(username, module_number, sensor_id,
 ######################################################################################################################################
 def Module_Encapsolation(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user):
     show_navigation_buttons()
-    previous_step_completed = all(flag == 'green' for flag in live_module_electronic_test_fully_bonded_flags.values())
+
+    previous_step_completed = all(flag == 'green' for flag in ogp_after_backside_bonding_flags.values())
     previous_step_flag = 'green' if previous_step_completed else 'red'
 
     if previous_step_flag == 'red':
