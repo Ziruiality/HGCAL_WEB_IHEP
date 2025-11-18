@@ -2250,12 +2250,12 @@ def create_qr_label(module_numbers, finished_table):
     # Calculate positions for 3 columns and 2 rows
 
     positions = [
-    (margin + 160, 2 * (qr_size + margin) + margin),  # 1-左下方
-    (width - qr_size - margin - 160, 2 * (qr_size + margin) + margin),  # 2-右下方
-    (margin + 160, 1 * (qr_size + margin) + margin),  # 3-左中
-    (width - qr_size - margin - 160, 1 * (qr_size + margin) + margin),  # 4-右中
-    (margin + 160, 0 * (qr_size + margin) + margin),  # 5-左上方
-    (width - qr_size - margin - 160, 0 * (qr_size + margin) + margin)  # 6-右上方
+    (margin + 180, 2 * (qr_size + margin) + margin),  # 1-左下方
+    (width - qr_size - margin - 180, 2 * (qr_size + margin) + margin),  # 2-右下方
+    (margin + 180, 1 * (qr_size + margin) + margin),  # 3-左中
+    (width - qr_size - margin - 180, 1 * (qr_size + margin) + margin),  # 4-右中
+    (margin + 180, 0 * (qr_size + margin) + margin),  # 5-左上方
+    (width - qr_size - margin - 180, 0 * (qr_size + margin) + margin)  # 6-右上方
     ]
 
    # Add logo and date in the center of the page
