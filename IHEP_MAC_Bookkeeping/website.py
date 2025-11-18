@@ -413,9 +413,9 @@ def Module_Assembly_Check_List(username):
                 Live_Module_Electronic_Test_Fully_Encapsulated_Flag = 'green' if live_module_electronic_test_fully_encapsulated_completed else 'red'
                 Live_Module_Electronic_Test_Fully_Encapsulated_Icon = '\u2705' if Live_Module_Electronic_Test_Fully_Encapsulated_Flag == 'green' else '\u274C'
 
-                final_ogp_completed = all(flag == 'green' for flag in ogp_after_module_encapsolation_flags.values())
-                Final_ogp_Flag = 'green' if ogp_after_module_encapsolation_completed else 'red'
-                Final_ogp_Icon = '\u2705' if Ogp_After_Module_Encapsolation_Flag == 'green' else '\u274C'
+                final_ogp_completed = all(flag == 'green' for flag in final_ogp_flags.values())
+                Final_ogp_Flag = 'green' if final_ogp_completed else 'red'
+                Final_ogp_Icon = '\u2705' if Final_ogp_Flag == 'green' else '\u274C'
  
 
                 col1, col2 = st.columns(2)
