@@ -53,7 +53,8 @@ STEPS = [
 "OGP After Backside Bonding",
 "Encapsolation",
 "OGP After Encapsolation",
-"Live Module Electronic Test - Fully Encapsulated"
+"Live Module Electronic Test - Fully Encapsulated",
+"Final OGP"
 ]
 
 ogp_before_assembly_flags = {
@@ -125,6 +126,11 @@ live_module_electronic_test_fully_encapsulated_flags={
     'Live module electronic test: Fully Encapsulated (Final Test)':'red',
     'Standard test procedure: Fully Encapsulated':'red',
 }
+
+final_ogp_flags = {
+    'Final OGP before packaging': 'red',
+}
+
 click_counts_ogp_before_assembly = {step: 0 for step in ogp_before_assembly_flags}
 click_counts_hexaboard_electronic_test_untaped = {step: 0 for step in hexaboard_electronic_test_untaped_flags}
 click_counts_apply_double_sided_tap_beneath_hexaboard = {step: 0 for step in apply_double_sided_tap_beneath_hexaboard_flags}
@@ -140,6 +146,7 @@ click_counts_live_module_electronic_test_fully_bonded = {step: 0 for step in liv
 click_counts_module_encapsolation = {step: 0 for step in module_encapsolation_flags}
 click_counts_ogp_after_module_encapsolation = {step: 0 for step in ogp_after_module_encapsolation_flags}
 click_counts_live_module_electronic_test_fully_encapsulated = {step: 0 for step in live_module_electronic_test_fully_encapsulated_flags}
+click_counts_final_ogp = {step: 0 for step in final_ogp_flags}
 
 
 ###############################################################################################
@@ -267,7 +274,8 @@ def initialize_session_state(module_number=None, sensor_id=None, hexboard_number
                               live_module_electronic_test_fully_bonded_flags,
                               module_encapsolation_flags,
                               ogp_after_module_encapsolation_flags,
-                              live_module_electronic_test_fully_encapsulated_flags]:
+                              live_module_electronic_test_fully_encapsulated_flags,
+                              final_ogp_flags]:
                     if step_ in flags:
                         flags[step_] = flag_
 
@@ -296,7 +304,8 @@ def initialize_session_state(module_number=None, sensor_id=None, hexboard_number
                           live_module_electronic_test_fully_bonded_flags,
                           module_encapsolation_flags,
                           ogp_after_module_encapsolation_flags,
-                          live_module_electronic_test_fully_encapsulated_flags]:
+                          live_module_electronic_test_fully_encapsulated_flags,
+                          final_ogp_flags]:
                 for step_ in flags:
                     flags[step_] = 'red'
 
@@ -403,6 +412,10 @@ def Module_Assembly_Check_List(username):
                 live_module_electronic_test_fully_encapsulated_completed = all(flag == 'green' for flag in live_module_electronic_test_fully_encapsulated_flags.values())
                 Live_Module_Electronic_Test_Fully_Encapsulated_Flag = 'green' if live_module_electronic_test_fully_encapsulated_completed else 'red'
                 Live_Module_Electronic_Test_Fully_Encapsulated_Icon = '\u2705' if Live_Module_Electronic_Test_Fully_Encapsulated_Flag == 'green' else '\u274C'
+
+                final_ogp_completed = all(flag == 'green' for flag in ogp_after_module_encapsolation_flags.values())
+                Final_ogp_Flag = 'green' if ogp_after_module_encapsolation_completed else 'red'
+                Final_ogp_Icon = '\u2705' if Ogp_After_Module_Encapsolation_Flag == 'green' else '\u274C'
  
 
                 col1, col2 = st.columns(2)
@@ -428,7 +441,8 @@ def Module_Assembly_Check_List(username):
                         "OGP After Bonding",
                         "Encapsolation",
                         "OGP After Encapsolation",
-                        "Live Module Electronic Test - Fully Encapsulated"
+                        "Live Module Electronic Test - Fully Encapsulated",
+                        "Final OGP"
                     ],
                     "Status": [
                         Ogp_Before_Assembly_Icon,
@@ -445,7 +459,8 @@ def Module_Assembly_Check_List(username):
                         Ogp_After_Backside_Bonding_Icon,
                         Module_Encapsolation_Icon,
                         Ogp_After_Module_Encapsolation_Icon,
-                        Live_Module_Electronic_Test_Fully_Encapsulated_Icon
+                        Live_Module_Electronic_Test_Fully_Encapsulated_Icon,
+                        Final_ogp_Icon
                     ]
                 })
 
@@ -514,6 +529,8 @@ def Module_Assembly_Check_List(username):
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
                 Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
+            elif option1 == "Final OGP":
+                Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
 
 ############################################################################################################################
@@ -566,7 +583,8 @@ def OGP_before_assembly(username, module_number, sensor_id, hexboard_number, bas
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -659,7 +677,8 @@ def Hexaboard_Electronic_Test_Untaped(username,module_number,sensor_id,hexboard_
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -746,7 +765,8 @@ def Apply_Double_Sided_Tap_Beneath_Hexaboard(username, module_number, sensor_id,
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -831,7 +851,8 @@ def Hexaboard_Electronic_Test_Taped(username, module_number, sensor_id, hexboard
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -928,7 +949,8 @@ def Assemble_Sensor(username, module_number, sensor_id, hexboard_number, basepla
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1025,7 +1047,8 @@ def OGP_After_Assemble_Sensor(username, module_number, sensor_id, hexboard_numbe
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1120,7 +1143,8 @@ def Assemble_Hexaboard(username, module_number, sensor_id, hexboard_number, base
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1216,7 +1240,8 @@ def OGP_After_Assemble_Hexaboard(username, module_number, sensor_id, hexboard_nu
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1311,7 +1336,8 @@ def Live_Module_Electronic_Test_Assembled(username, module_number, sensor_id, he
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1407,7 +1433,8 @@ def Bonding(username, module_number, sensor_id, hexboard_number, baseplate_numbe
             "OGP After Bonding": ogp_after_backside_bonding_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1483,9 +1510,27 @@ def OGP_After_Backside_Bonding(username, module_number, sensor_id, hexboard_numb
         st.write("### OGP After Bonding Steps Overview")
         st.table(df_steps)
 
-    ogp_after_backside_bonding_completed = all(flag == 'green' for flag in ogp_after_backside_bonding_flags.values())
-    Ogp_After_Backside_Bonding_Flag = 'green' if ogp_after_backside_bonding_completed else 'red'
-    Ogp_After_Backside_Bonding_Icon = '\u2705' if Ogp_After_Backside_Bonding_Flag == 'green' else '\u274C'
+    has_red = any(flag == 'red' for flag in ogp_after_backside_bonding_flags.values())
+    has_yellow = any(flag == 'yellow' for flag in ogp_after_backside_bonding_flags.values())
+
+    if has_red:
+        Ogp_After_Backside_Bonding_Flag = 'red'
+    elif has_yellow:
+        Ogp_After_Backside_Bonding_Flag = 'yellow'
+    else:
+        Ogp_After_Backside_Bonding_Flag = 'green'
+
+    icon_map = {
+        'green':  '\u2705',   # 
+        'yellow': '\u26A0\uFE0F',   # 
+        'red':    '\u274C'    # 
+    }
+    Ogp_After_Backside_Bonding_Icon = icon_map[Ogp_After_Backside_Bonding_Flag]
+
+
+    #ogp_after_backside_bonding_completed = all(flag == 'green' for flag in ogp_after_backside_bonding_flags.values())
+    #Ogp_After_Backside_Bonding_Flag = 'green' if ogp_after_backside_bonding_completed else 'red'
+    #Ogp_After_Backside_Bonding_Icon = '\u2705' if Ogp_After_Backside_Bonding_Flag == 'green' else '\u274C'
     st.header(f"OGP After Bonding Check List: {Ogp_After_Backside_Bonding_Icon}")
 
     if st.button("Save Flags to File"):
@@ -1504,7 +1549,8 @@ def OGP_After_Backside_Bonding(username, module_number, sensor_id, hexboard_numb
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1519,7 +1565,7 @@ def OGP_After_Backside_Bonding(username, module_number, sensor_id, hexboard_numb
         find_unfinished_modules()
 
         subject = "MAC Production Status Change Notification: OGP After Bonding"
-        message = f"""Dear OGP and Encapsolation Teams,
+        message = f"""Dear OGP, Bonding and Encapsolation Teams,
 
             Please be informed that the status of the step: OGP After Bonding has changed.
 
@@ -1545,6 +1591,14 @@ def OGP_After_Backside_Bonding(username, module_number, sensor_id, hexboard_numb
 
         send_email_notification(
             group_name="Encapsolation",
+            subject=subject,
+            message=message,
+            sender_email="hgcalcn@cern.ch",
+            sender_password="dummyPW"
+        )
+
+        send_email_notification(
+            group_name="Bonding",
             subject=subject,
             message=message,
             sender_email="hgcalcn@cern.ch",
@@ -1600,7 +1654,8 @@ def Live_Module_Electronic_Test_Fully_Bonded(username, module_number, sensor_id,
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1697,7 +1752,8 @@ def Module_Encapsolation(username, module_number, sensor_id, hexboard_number, ba
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1792,7 +1848,8 @@ def OGP_After_Module_Encapsolation(username, module_number, sensor_id, hexboard_
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1807,7 +1864,7 @@ def OGP_After_Module_Encapsolation(username, module_number, sensor_id, hexboard_
         find_unfinished_modules()
 
         subject = "MAC Production Status Change Notification: OGP After Encapsolation"
-        message = f"""Dear OGP and Electrical Test Teams,
+        message = f"""Dear OGP, Bonding and Electrical Test Teams,
 
             Please be informed that the status of the step: OGP After Encapsolation has changed.
 
@@ -1839,12 +1896,17 @@ def OGP_After_Module_Encapsolation(username, module_number, sensor_id, hexboard_
             sender_password="dummyPW"
         )
 
+        send_email_notification(
+            group_name="Bonding",
+            subject=subject,
+            message=message,
+            sender_email="hgcalcn@cern.ch",
+            sender_password="dummyPW"
+        )
 ######################################################################################################################################
 def Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user):
-    col1, col2 = st.columns(2)    
-    with col1:
-        if st.button("\u2B05\uFE0FPrevious Step", key="prev_step") and st.session_state.step_index > 0:
-            navigate(-1)
+    show_navigation_buttons()
+
     previous_step_completed = all(flag == 'green' for flag in ogp_after_module_encapsolation_flags.values())
     previous_step_flag = 'green' if previous_step_completed else 'red'
 
@@ -1890,7 +1952,8 @@ def Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sens
             "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
-            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
 
             }
         details = {
@@ -1928,6 +1991,97 @@ def Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sens
             sender_email="hgcalcn@cern.ch",
             sender_password="dummyPW"
         )
+
+def Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user):
+    col1, col2 = st.columns(2)    
+    with col1:
+        if st.button("\u2B05\uFE0FPrevious Step", key="prev_step") and st.session_state.step_index > 0:
+            navigate(-1)
+    previous_step_completed = all(flag == 'green' for flag in live_module_electronic_test_fully_encapsulated_flags.values())
+    previous_step_flag = 'green' if previous_step_completed else 'red'
+
+    if previous_step_flag == 'red':
+        st.write("Please finish the previous step first")
+
+    if (read_user_group(username) in ['OGP', 'All']) and previous_step_flag == 'green':
+        status_options = {'\u2705 Green': 'green', '\u26A0\uFE0F Yellow': 'yellow', '\u274C Red': 'red'}
+
+        for step, flag in final_ogp_flags.items():
+            selected_label = st.radio(f"{step} Flag:", list(status_options.keys()), 
+                                      index=list(status_options.values()).index(flag), 
+                                      key=f'{step}_radio', 
+                                      help=f'Click count: {click_counts_final_ogp[step]}')
+            final_ogp_flags[step] = status_options[selected_label]
+            click_counts_final_ogp[step] += 1
+
+        table_data = [[step, '\u2705' if flag == 'green' else '\u26A0\uFE0F' if flag == 'yellow' else '\u274C', last_user] 
+                      for step, flag in final_ogp_flags.items()]
+        df_steps = pd.DataFrame(table_data, columns=["Step", "Status", "Status Changed by"])
+
+        st.write("### Final OGP Overview")
+        st.table(df_steps)
+
+    final_ogp_completed = all(flag == 'green' for flag in final_ogp_flags.values())
+    Final_ogp_Flag = 'green' if final_ogp_completed else 'red'
+    Final_ogp_Icon = '\u2705' if Final_ogp_Flag == 'green' else '\u274C'
+    st.header(f"Final OGP Check List: {Final_ogp_Icon}")
+
+    if st.button("Save Flags to File"):
+        all_checklists_flags = {
+            "OGP Before Assembly": ogp_before_assembly_flags,
+            "Hexaboard Electronic Test - Untaped": hexaboard_electronic_test_untaped_flags,
+            "Apply Double-sided Tap Beneath Hexaboard": apply_double_sided_tap_beneath_hexaboard_flags,
+            "Hexaboard Electronic Test - Taped": hexaboard_electronic_test_taped_flags,
+            "Assemble Sensor": assemble_sensor_flags,
+            "OGP After Assemble Sensor": ogp_after_assemble_sensor_flags,
+            "Assemble Hexaboard": assemble_hexaboard_flags,
+            "OGP After Assemble Hexaboard": ogp_after_assemble_hexaboard_flags,
+            "Live Module Electronic Test - Assembled": live_module_electronic_test_assembled_flags,
+            "Bonding": bonding_flags,
+            "OGP After Bonding": ogp_after_backside_bonding_flags,
+            "Live Module Electronic Test - Fully Bonded": live_module_electronic_test_fully_bonded_flags,
+            "Encapsolation": module_encapsolation_flags,
+            "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
+            "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
+            "Final OGP": final_ogp_flags
+
+            }
+        details = {
+            'Module Number': module_number,
+            'Sensor ID': sensor_id,
+            'Hexboard Number': hexboard_number,
+            'Baseplate Number': baseplate_number,
+            'Remeasurement Number': remeasurement_number,
+        }
+                   
+        save_flags_to_file(all_checklists_flags, details,"data/output.csv",username,usergroup,comment)
+        find_unfinished_modules()
+
+        subject = "MAC Production Status Change Notification: Final OGP before Packaging"
+        message = f"""Dear OGP Team,
+
+            Please be informed that the status of the step: Final OGP has changed.
+
+            Status: {Final_ogp_Icon}
+            Changed by: {username}
+            Module Number: {module_number}
+            Sensor ID: {sensor_id}
+            Hexboard Number: {hexboard_number}
+            Baseplate Number: {baseplate_number}
+            Remeasurement Number: {remeasurement_number}
+            Comment: {comment}
+
+            Best regards,  
+            IHEP MAC Checklist Website"""
+
+        send_email_notification(
+            group_name="OGP",
+            subject=subject,
+            message=message,
+            sender_email="hgcalcn@cern.ch",
+            sender_password="dummyPW"
+        )
+
 
 ######################################################################################################################################
 
@@ -2587,6 +2741,7 @@ def save_flags_to_file(flags_dict, details_dict, filename, username, usergroup, 
 ################################################################################################################################################
 def home_page():
     st.title("CMS HGCal IHEP MAC: Module Assembly and Status Bookkeeping System")
+    st.caption("**Version:** v0.5") 
     st.image("IHEP_MAC_Bookkeeping/ReeseLabs_hexagon.jpg", use_container_width=True)
     # Add content for the home page
 ##############################################################################################################################################
