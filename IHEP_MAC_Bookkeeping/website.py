@@ -53,8 +53,7 @@ STEPS = [
 "OGP After Backside Bonding",
 "Encapsolation",
 "OGP After Encapsolation",
-"Live Module Electronic Test - Fully Encapsulated",
-"Final OGP"
+"Live Module Electronic Test - Fully Encapsulated"
 ]
 
 ogp_before_assembly_flags = {
@@ -304,12 +303,12 @@ def initialize_session_state(module_number=None, sensor_id=None, hexboard_number
                           live_module_electronic_test_fully_bonded_flags,
                           module_encapsolation_flags,
                           ogp_after_module_encapsolation_flags,
-                          live_module_electronic_test_fully_encapsulated_flags,
-                          final_ogp_flags]:
+                          live_module_electronic_test_fully_encapsulated_flags]:
                 for step_ in flags:
                     flags[step_] = 'red'
 
-            for flags in [live_module_electronic_test_assembled_flags]:
+            for flags in [live_module_electronic_test_assembled_flags,
+                          final_ogp_flags]:
                 for step_ in flags:
                     flags[step_] = 'green'
 
@@ -414,7 +413,7 @@ def Module_Assembly_Check_List(username):
                 Live_Module_Electronic_Test_Fully_Encapsulated_Icon = '\u2705' if Live_Module_Electronic_Test_Fully_Encapsulated_Flag == 'green' else '\u274C'
 
                 final_ogp_completed = all(flag == 'green' for flag in final_ogp_flags.values())
-                Final_ogp_Flag = 'green' if final_ogp_completed else 'red'
+                Final_ogp_Flag = 'green' #if final_ogp_completed else 'red'
                 Final_ogp_Icon = '\u2705' if Final_ogp_Flag == 'green' else '\u274C'
  
 
@@ -441,8 +440,8 @@ def Module_Assembly_Check_List(username):
                         "OGP After Bonding",
                         "Encapsolation",
                         "OGP After Encapsolation",
-                        "Live Module Electronic Test - Fully Encapsulated",
-                        "Final OGP"
+                        "Live Module Electronic Test - Fully Encapsulated"
+                        #"Final OGP"
                     ],
                     "Status": [
                         Ogp_Before_Assembly_Icon,
@@ -460,7 +459,7 @@ def Module_Assembly_Check_List(username):
                         Module_Encapsolation_Icon,
                         Ogp_After_Module_Encapsolation_Icon,
                         Live_Module_Electronic_Test_Fully_Encapsulated_Icon,
-                        Final_ogp_Icon
+                        #Final_ogp_Icon
                     ]
                 })
 
@@ -529,8 +528,8 @@ def Module_Assembly_Check_List(username):
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
                 Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
-            elif option1 == "Final OGP":
-                Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
+            #elif option1 == "Final OGP":
+            #    Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
 
 ############################################################################################################################
@@ -1905,7 +1904,10 @@ def OGP_After_Module_Encapsolation(username, module_number, sensor_id, hexboard_
         )
 ######################################################################################################################################
 def Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user):
-    show_navigation_buttons()
+    col1, col2 = st.columns(2)    
+    with col1:
+        if st.button("\u2B05\uFE0FPrevious Step", key="prev_step") and st.session_state.step_index > 0:
+            navigate(-1)
 
     previous_step_completed = all(flag == 'green' for flag in ogp_after_module_encapsolation_flags.values())
     previous_step_flag = 'green' if previous_step_completed else 'red'
@@ -2335,6 +2337,11 @@ def print_QR(username):
         if finished_df.empty:
             st.header("No finished module found.")
             return
+        try:
+            packaged_df = pd.read_csv("data/packaged_modules.csv")
+            packaged_set = set(packaged_df["Module Number"].astype(str).str.strip())
+        except FileNotFoundError:
+            packaged_set = set()
 
         # Group by module-related fields and check if all steps have 'green' flags
         grouped = finished_df.groupby(['Module Number', 'Sensor ID', 'Hexboard Number', 'Baseplate Number', 'Remeasurement Number'])
@@ -2343,6 +2350,8 @@ def print_QR(username):
         for group_name, group_data in grouped:
             module_number = group_name[0]
             
+            if module_number in packaged_set:
+                continue
             if all(group_data['Flag'] == 'green'):  # Check if all steps have green flags
                 comment = group_data.iloc[0]['Comment'] if not group_data.empty else None
                 finished_modules.append({
@@ -2370,14 +2379,14 @@ def print_QR(username):
         selected_modules = st.multiselect("Select modules for printing QR labels:", finished_table["Module Number"].tolist())
 
         # Check if exactly 6 modules are selected
-        if len(selected_modules) == 6:
+        if len(selected_modules) > 0 and len(selected_modules) <= 6:
             if st.button("Generate QR Code Label"):
                 # Create the QR code label
                 create_qr_label(selected_modules, finished_table)
         elif len(selected_modules) > 6:
-            st.warning("Please select exactly 6 modules for printing.")
+            st.warning("Please select no more than 6 modules for printing.")
         else:
-            st.info(f"Please select 6 modules. Currently selected: {len(selected_modules)}")
+            st.info(f"Please select 1-6 modules. Currently selected: {len(selected_modules)}")
 
 
     except pd.errors.EmptyDataError:
@@ -2741,7 +2750,7 @@ def save_flags_to_file(flags_dict, details_dict, filename, username, usergroup, 
 ################################################################################################################################################
 def home_page():
     st.title("CMS HGCal IHEP MAC: Module Assembly and Status Bookkeeping System")
-    st.caption("**Version:** v0.5") 
+    st.caption("**Version:** v0.51") 
     st.image("IHEP_MAC_Bookkeeping/ReeseLabs_hexagon.jpg", use_container_width=True)
     # Add content for the home page
 ##############################################################################################################################################
