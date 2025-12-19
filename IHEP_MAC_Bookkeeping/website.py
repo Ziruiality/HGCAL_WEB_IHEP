@@ -2119,47 +2119,123 @@ def find_unfinished_modules():
     unfinished_df.to_csv("data/unfinished_module.csv", index=False)
 
 ############################################################################################################################
+def get_step_order():
+    # Assign priority values (smaller = earlier in sequence)
+    # The three target steps are reordered: B(18) → C(19) → A(20)
+    step_order = {
+        # OGP Before Assembly
+        "Visual inspection for damage and thickness for sensor": 1,
+        "Thickness and inspection for baseplate": 2,
+        "Thickness and inspection for hexboard": 3,
+        "Cleaning of sensor, baseplate and Hexa- board": 4,
+        # Hexaboard Electronic Test - Untaped
+        "Hexaboard electronic test: Untaped": 5,
+        "Pedestal run: Untaped": 6,
+        # Apply Double-sided Tap Beneath Hexaboard
+        "Apply double-sided tap beneath Hexaboard": 7,
+        # Hexaboard Electronic Test - Taped
+        "Hexaboard electronic test: Taped": 8,
+        "Pedestal run: Taped": 9,
+        # Assemble Sensor
+        "Gluing of silicon sensor on base plate": 10,
+        # OGP After Assemble Sensor
+        "Inspection of glued base plate + sensor": 11,
+        # Assemble Hexaboard
+        "Gluing of Hexaboard on protomodule": 12,
+        # OGP After Assemble Hexaboard
+        "Inspection of module": 13,
+        # Live Module Electronic Test - Assembled
+        "Hexaboard electronic test: Assembled": 14,
+        "Pedestal run: Assembled": 15,
+        # Bonding
+        "Wire bonding of the module": 16,
+        "Pull test for frontside bonding": 17,
+        # Key Adjustment: Reordered target steps
+        "Live module electronic test: Fully Bonded": 18,  # Step B
+        "Standard test procedure: Fully Bonded": 19,      # Step C
+        "Visual inspection of bonded module before encapsolation": 20,  # Step A
+        # Encapsolation
+        "Encapsolation of the module and curing": 21,
+        # OGP After Encapsolation
+        "Visual inspection of encapsulated module": 22,
+        # Live Module Electronic Test - Fully Encapsulated
+        "Live module electronic test: Fully Encapsulated (Final Test)": 23,
+        "Standard test procedure: Fully Encapsulated": 24,
+        # Final OGP
+        "Final OGP before packaging": 25
+    }
+    return step_order
+
+
 def show_unfinished_modules(username):
+    # Get the step order map
+    step_order = get_step_order()
+    
     try:
+        # Read CSV (handle empty leading column in your CSV)
+        # Use header=0 to auto-detect columns, skip bad lines if needed
         unfinished_df = pd.read_csv("data/output.csv")
         if unfinished_df.empty:
             st.header("Congratulations, no unfinished module found.")
+            return
+
+        # Filter modules with red/yellow flags
+        unfinished_red_flags = unfinished_df[unfinished_df["Flag"].isin(["red", "yellow"])].copy()
+
+        # If no red/yellow flags, show info
+        if unfinished_red_flags.empty:
+            st.info("No unfinished modules with red flags found.")
+            return
+
+        # Group by module unique identifiers
+        group_columns = [
+            "Module Number", 
+            "Sensor ID", 
+            "Hexboard Number", 
+            "Baseplate Number", 
+            "Remeasurement Number"
+        ]
+        grouped_unfinished = unfinished_red_flags.groupby(group_columns)
+
+        module_info = []
+        for group_name, group_data in grouped_unfinished:
+            # Add step order column for sorting
+            group_data["step_priority"] = group_data["Step"].map(step_order)
+            # Fill NaN for unexpected steps (assign low priority)
+            group_data["step_priority"] = group_data["step_priority"].fillna(999)
+            # Sort by step priority (ascending = earlier steps first)
+            sorted_group = group_data.sort_values(by="step_priority", ascending=True)
+            
+            # Get the first step (highest priority) and its comment
+            first_red_flag_step = sorted_group.iloc[0]["Step"]
+            comment = sorted_group.iloc[0]["Comment"].strip() if pd.notna(sorted_group.iloc[0]["Comment"]) else "None"
+
+            # Append module info
+            module_info.append({
+                "Module Number": group_name[0],
+                "Sensor ID": group_name[1],
+                "Hexboard Number": group_name[2],
+                "Baseplate Number": group_name[3],
+                "Next Step": first_red_flag_step,
+                "Remeasurement Number": group_name[4],
+                "Comment": comment
+            })
+
+        # Display the result table
+        if module_info:
+            unfinished_table = pd.DataFrame(module_info)
+            unfinished_table.index = range(1, len(unfinished_table) + 1)
+            st.write(unfinished_table)
+            st.warning("\u26A0\uFE0F Please finish those modules in the Module Assembly Check List.")
         else:
-            # Filter the unfinished modules with red flags
-            unfinished_red_flags = unfinished_df[unfinished_df['Flag'].isin(['red', 'yellow'])]
+            st.info("No unfinished modules with red flags found.")
 
-            # Group by the criteria and get the first step with red flag for each unfinished module
-            grouped_unfinished = unfinished_red_flags.groupby(['Module Number', 'Sensor ID', 'Hexboard Number', 'Baseplate Number', 'Remeasurement Number'])
-            module_info = []
-            usergroup=read_user_group(username)
-            for group_name, group_data in grouped_unfinished:
-                # Find the first step with a red flag for each module
-                red_flag_data = group_data[group_data['Flag'].isin(['red', 'yellow'])]
-                first_red_flag_step = red_flag_data.iloc[0]['Step'] if not red_flag_data.empty else None
-                comment = group_data.iloc[0]['Comment'] if not group_data.empty else None
-                # Extract relevant information for display
-                module_info.append({
-                    'Module Number': group_name[0],
-                    'Sensor ID': group_name[1],
-                    'Hexboard Number': group_name[2],
-                    'Baseplate Number': group_name[3],
-                    'Next Step': first_red_flag_step,
-                    'Remeasurement Number': group_name[4],
-                    'Comment':comment
-                })
-
-            if module_info:
-                unfinished_table = pd.DataFrame(module_info)
-                unfinished_table.index = range(1, len(unfinished_table) + 1)
-                st.write(unfinished_table)
-                st.warning("\u26A0\uFE0F Please finish those modules in the Module Assembly Check List.")
-            else:
-                st.info("No unfinished modules with red flags found.")
-         
     except pd.errors.EmptyDataError:
         st.header("Congratulations, no unfinished module found.")
     except FileNotFoundError:
-        st.error("unfinished_module.csv was not found. Please check the file path.")            
+        st.error("output.csv was not found. Please check the file path.")
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
 
 
 
