@@ -40,10 +40,10 @@ def show_navigation_buttons():
 
 STEPS = [
 "Overview",
-"OGP Before Assembly",
-"Hexaboard Electronic Test - Untaped",
-"Apply Double-sided Tap Beneath Hexaboard",
-"Hexaboard Electronic Test - Taped",
+#"OGP Before Assembly",
+#"Hexaboard Electronic Test - Untaped",
+#"Apply Double-sided Tap Beneath Hexaboard",
+#"Hexaboard Electronic Test - Taped",
 "Assemble Sensor",
 "OGP After Assemble Sensor",
 "Assemble Hexaboard",
@@ -290,11 +290,7 @@ def initialize_session_state(module_number=None, sensor_id=None, hexboard_number
                 st.warning("\u26A0\uFE0F No existing data found. Initializing module with default values (red flags).")
 
             # Initialize all flags to 'red'
-            for flags in [ogp_before_assembly_flags, 
-                          hexaboard_electronic_test_untaped_flags,
-                          apply_double_sided_tap_beneath_hexaboard_flags,
-                          hexaboard_electronic_test_taped_flags,
-                          assemble_sensor_flags,
+            for flags in [assemble_sensor_flags,
                           ogp_after_assemble_sensor_flags,
                           assemble_hexaboard_flags,
                           ogp_after_assemble_hexaboard_flags,
@@ -308,7 +304,11 @@ def initialize_session_state(module_number=None, sensor_id=None, hexboard_number
                 for step_ in flags:
                     flags[step_] = 'red'
 
-            for flags in [live_module_electronic_test_assembled_flags,
+            for flags in [ogp_before_assembly_flags, 
+                          hexaboard_electronic_test_untaped_flags,
+                          apply_double_sided_tap_beneath_hexaboard_flags,
+                          hexaboard_electronic_test_taped_flags,
+                          live_module_electronic_test_assembled_flags,
                           final_ogp_flags]:
                 for step_ in flags:
                     flags[step_] = 'green'
@@ -427,10 +427,10 @@ def Module_Assembly_Check_List(username):
                 # Create a DataFrame for a cleaner display
                 checklist_df = pd.DataFrame({
                     "Step": [                        
-                        "OGP Before Assembly",
-                        "Hexaboard Electronic Test - Untaped",
-                        "Apply Double-sided Tap Beneath Hexaboard",
-                        "Hexaboard Electronic Test - Taped",
+                        #"OGP Before Assembly",
+                        #"Hexaboard Electronic Test - Untaped",
+                        #"Apply Double-sided Tap Beneath Hexaboard",
+                        #"Hexaboard Electronic Test - Taped",
                         "Assemble Sensor",
                         "OGP After Assemble Sensor",
                         "Assemble Hexaboard",
@@ -445,10 +445,10 @@ def Module_Assembly_Check_List(username):
                         #"Final OGP"
                     ],
                     "Status": [
-                        Ogp_Before_Assembly_Icon,
-                        Hexaboard_Electronic_Test_Untaped_Icon,
-                        Apply_Double_Sided_Tap_Beneath_Hexaboard_Icon,
-                        Hexaboard_Electronic_Test_Taped_Icon,
+                        #Ogp_Before_Assembly_Icon,
+                        #Hexaboard_Electronic_Test_Untaped_Icon,
+                        #Apply_Double_Sided_Tap_Beneath_Hexaboard_Icon,
+                        #Hexaboard_Electronic_Test_Taped_Icon,
                         Assemble_Sensor_Icon,
                         Ogp_After_Assemble_Sensor_Icon,
                         Assemble_Hexaboard_Icon,
