@@ -1,5 +1,6 @@
 import streamlit as st
 import csv
+import json
 import pandas as pd
 import os
 from datetime import datetime
@@ -11,7 +12,7 @@ import numpy as np
 import qrcode
 from PIL import Image, ImageDraw, ImageFont
 import io
-
+from datetime import datetime
 from mail_notification import send_email_notification
 
 
@@ -2824,11 +2825,78 @@ def save_flags_to_file(flags_dict, details_dict, filename, username, usergroup, 
         flags_df.to_csv(filename, mode='w', index=False, header=True, sep=',')
         st.success(f"Flags saved to {filename}")
 ################################################################################################################################################
-def home_page():
+# --- Data Handling (Modified for Calendar) ---
+def handle_plan_data(content=None, action="read"):
+    file_path = "data/production_plan.json"
+    if action == "write":
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(content, f, ensure_ascii=False)
+    else:
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        return [] # Return empty list if no data
+################################################################################################################################################    
+def home_page(username):
     st.title("CMS HGCal IHEP MAC: Module Assembly and Status Bookkeeping System")
-    st.caption("**Version:** v0.51") 
+    st.caption("**Version:** v0.6.0 (Production Calendar Integrated)") 
+
+    st.divider()
+    
+    # --- 1. Authorized Admin Section (Calendar Input) ---
+    authorized_users = ["zirui.wang@cern.ch","zhanghq@ihep.ac.cn","xiew@ihep.ac.cn","wangfeng@ihep.ac.cn"]
+    all_events = handle_plan_data(action="read")
+
+    if username in authorized_users:
+        with st.expander("Schedule Production Target (Admin Access)"):
+            col1, col2 = st.columns(2)
+            with col1:
+                start_date = st.date_input("Start Date")
+                end_date = st.date_input("End Date")
+            with col2:
+                task_title = st.text_input("Target Description", placeholder="e.g., Assemble 50 Hexaboard Modules")
+                task_color = st.color_picker("Color Code", "#ff4b4b")
+
+            if st.button("Add to Production Calendar"):
+                new_event = {
+                    "title": task_title,
+                    "start": start_date.strftime("%Y-%m-%d"),
+                    "end": end_date.strftime("%Y-%m-%d"),
+                    "color": task_color
+                }
+                all_events.append(new_event)
+                handle_plan_data(content=all_events, action="write")
+                st.success("New production target scheduled!")
+                st.rerun()
+
+            if st.button("Clear All Plans", type="secondary"):
+                handle_plan_data(content=[], action="write")
+                st.rerun()
+
+    # --- 2. Calendar Display ---
+    st.header("Production Plan and Target")
+    
+    # Option A: Interactive Calendar (Requires: pip install streamlit-calendar)
+    # If you can't install external libs, Option B is safer.
+    try:
+        from streamlit_calendar import calendar
+        calendar_options = {
+            "initialView": "dayGridMonth",
+            "headerToolbar": {"left": "prev,next today", "center": "title", "right": "dayGridMonth,timeGridWeek"},
+            "selectable": True,
+        }
+        calendar(events=all_events, options=calendar_options)
+    except ImportError:
+        #st.info("💡 Calendar view enabled. For a list view of targets:")
+        for event in all_events[::-1]:
+            st.markdown(f"""
+            <div style="background-color:#f0f2f6; padding:10px; border-radius:5px; border-left:10px solid {event['color']}; margin-bottom:10px;">
+                <strong>{event['start']} to {event['end']}</strong>: {event['title']}
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.divider()
     st.image("IHEP_MAC_Bookkeeping/ReeseLabs_hexagon.jpg", use_container_width=True)
-    # Add content for the home page
 ##############################################################################################################################################
 def main():
     st.set_page_config(layout="wide", page_title="HGCAL IHEP MAC", page_icon="IHEP_MAC_Bookkeeping/hex_ver_1.png")
@@ -2879,7 +2947,7 @@ def main():
         option = st.sidebar.selectbox("", ("Home", "Module Assembly Check List", "Unfinished Modules", "Finished Modules", "Packaging Modules", "Print QR label","Module Status Summary"), key="option_select")  # Unique key for option select
         
         if option == "Home":
-            home_page()
+            home_page(username)
         if option == "Module Assembly Check List":
             Module_Assembly_Check_List(username)
         if option == "Unfinished Modules":
