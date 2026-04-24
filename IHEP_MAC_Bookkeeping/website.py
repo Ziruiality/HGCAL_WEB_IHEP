@@ -2839,7 +2839,7 @@ def handle_plan_data(content=None, action="read"):
 ################################################################################################################################################    
 def home_page(username):
     st.title("CMS HGCal IHEP MAC: Module Assembly and Status Bookkeeping System")
-    st.caption("**Version:** v0.6.0 (Production Calendar Integrated)") 
+    st.caption("**Version:** v0.6.1 (MMTS Procedure Integrated)") 
 
     st.divider()
     
