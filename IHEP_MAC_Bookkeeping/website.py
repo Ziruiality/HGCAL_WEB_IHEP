@@ -123,8 +123,8 @@ ogp_after_module_encapsolation_flags={
 }
 
 live_module_electronic_test_fully_encapsulated_flags={
-    'Live module electronic test: Fully Encapsulated (Final Test)':'red',
-    'Standard test procedure: Fully Encapsulated':'red',
+    'MMTS test':'red',
+    'Bolted test procedure':'red',
 }
 
 final_ogp_flags = {
@@ -2160,8 +2160,8 @@ def get_step_order():
         # OGP After Encapsolation
         "Visual inspection of encapsulated module": 22,
         # Live Module Electronic Test - Fully Encapsulated
-        "Live module electronic test: Fully Encapsulated (Final Test)": 23,
-        "Standard test procedure: Fully Encapsulated": 24,
+        "MMTS test": 23,
+        "Bolted test procedure": 24,
         # Final OGP
         "Final OGP before packaging": 25
     }
