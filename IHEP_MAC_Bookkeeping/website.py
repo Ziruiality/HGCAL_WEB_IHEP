@@ -45,16 +45,17 @@ STEPS = [
 #"Apply Double-sided Tap Beneath Hexaboard",
 #"Hexaboard Electronic Test - Taped",
 "Assemble Sensor",
-"OGP After Assemble Sensor",
+#"OGP After Assemble Sensor",
 "Assemble Hexaboard",
-"OGP After Assemble Hexaboard",
+"OGP After Assembling",
 #"Live Module Electronic Test: Assembled",
 "Bonding",
 "Live Module Electronic Test - Fully Bonded",
-"OGP After Backside Bonding",
+#"OGP After Backside Bonding",
 "Encapsolation",
-"OGP After Encapsolation",
-"Live Module Electronic Test - Fully Encapsulated"
+#"OGP After Encapsolation",
+"MMTS",
+"Final Electronic Test"
 ]
 
 ogp_before_assembly_flags = {
@@ -128,7 +129,7 @@ live_module_electronic_test_fully_encapsulated_flags={
 }
 
 final_ogp_flags = {
-    'Final OGP before packaging': 'red',
+    'Final electronic test before packaging': 'red',
 }
 
 click_counts_ogp_before_assembly = {step: 0 for step in ogp_before_assembly_flags}
@@ -291,25 +292,25 @@ def initialize_session_state(module_number=None, sensor_id=None, hexboard_number
 
             # Initialize all flags to 'red'
             for flags in [assemble_sensor_flags,
-                          ogp_after_assemble_sensor_flags,
                           assemble_hexaboard_flags,
                           ogp_after_assemble_hexaboard_flags,
                           live_module_electronic_test_assembled_flags,
                           bonding_flags,
-                          ogp_after_backside_bonding_flags,
                           live_module_electronic_test_fully_bonded_flags,
                           module_encapsolation_flags,
-                          ogp_after_module_encapsolation_flags,
-                          live_module_electronic_test_fully_encapsulated_flags]:
+                          live_module_electronic_test_fully_encapsulated_flags,
+                          final_ogp_flags]:
                 for step_ in flags:
                     flags[step_] = 'red'
 
             for flags in [ogp_before_assembly_flags, 
+                          ogp_after_assemble_sensor_flags,
                           hexaboard_electronic_test_untaped_flags,
                           apply_double_sided_tap_beneath_hexaboard_flags,
                           hexaboard_electronic_test_taped_flags,
                           live_module_electronic_test_assembled_flags,
-                          final_ogp_flags]:
+                          ogp_after_backside_bonding_flags,
+                          ogp_after_module_encapsolation_flags]:
                 for step_ in flags:
                     flags[step_] = 'green'
 
@@ -414,7 +415,7 @@ def Module_Assembly_Check_List(username):
                 Live_Module_Electronic_Test_Fully_Encapsulated_Icon = '\u2705' if Live_Module_Electronic_Test_Fully_Encapsulated_Flag == 'green' else '\u274C'
 
                 final_ogp_completed = all(flag == 'green' for flag in final_ogp_flags.values())
-                Final_ogp_Flag = 'green' #if final_ogp_completed else 'red'
+                Final_ogp_Flag = 'green' if final_ogp_completed else 'red'
                 Final_ogp_Icon = '\u2705' if Final_ogp_Flag == 'green' else '\u274C'
  
 
@@ -432,17 +433,17 @@ def Module_Assembly_Check_List(username):
                         #"Apply Double-sided Tap Beneath Hexaboard",
                         #"Hexaboard Electronic Test - Taped",
                         "Assemble Sensor",
-                        "OGP After Assemble Sensor",
+                        #"OGP After Assemble Sensor",
                         "Assemble Hexaboard",
-                        "OGP After Assemble Hexaboard",
+                        "OGP After Assembling",
                         #"Live Module Electronic Test: Assembled",
                         "Bonding",
                         "Live Module Electronic Test - Fully Bonded",
-                        "OGP After Bonding",
+                        #"OGP After Bonding",
                         "Encapsolation",
-                        "OGP After Encapsolation",
-                        "Live Module Electronic Test - Fully Encapsulated"
-                        #"Final OGP"
+                        #"OGP After Encapsolation",
+                        "MMTS",
+                        "Final Electronic Test"
                     ],
                     "Status": [
                         #Ogp_Before_Assembly_Icon,
@@ -450,17 +451,17 @@ def Module_Assembly_Check_List(username):
                         #Apply_Double_Sided_Tap_Beneath_Hexaboard_Icon,
                         #Hexaboard_Electronic_Test_Taped_Icon,
                         Assemble_Sensor_Icon,
-                        Ogp_After_Assemble_Sensor_Icon,
+                        #Ogp_After_Assemble_Sensor_Icon,
                         Assemble_Hexaboard_Icon,
                         Ogp_After_Assemble_Hexaboard_Icon,
                         #Live_Module_Electronic_Test_Assembled_Icon,
                         Bonding_Icon,
                         Live_Module_Electronic_Test_Fully_Bonded_Icon,
-                        Ogp_After_Backside_Bonding_Icon,
+                        #Ogp_After_Backside_Bonding_Icon,
                         Module_Encapsolation_Icon,
-                        Ogp_After_Module_Encapsolation_Icon,
+                        #Ogp_After_Module_Encapsolation_Icon,
                         Live_Module_Electronic_Test_Fully_Encapsulated_Icon,
-                        #Final_ogp_Icon
+                        Final_ogp_Icon
                     ]
                 })
 
@@ -497,7 +498,7 @@ def Module_Assembly_Check_List(username):
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
                 Assemble_Hexaboard(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
-            elif option1 == "OGP After Assemble Hexaboard":
+            elif option1 == "OGP After Assembling":
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
                 OGP_After_Assemble_Hexaboard(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
@@ -525,12 +526,12 @@ def Module_Assembly_Check_List(username):
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
                 OGP_After_Module_Encapsolation(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
-            elif option1 == "Live Module Electronic Test - Fully Encapsulated":
+            elif option1 == "MMTS":
                 success, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, last_user = initialize_session_state(module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number)
                 Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
-            #elif option1 == "Final OGP":
-            #    Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
+            elif option1 == "Final Electronic Test":
+                Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user)
 
 
 ############################################################################################################################
@@ -1216,7 +1217,7 @@ def OGP_After_Assemble_Hexaboard(username, module_number, sensor_id, hexboard_nu
                       for step, flag in ogp_after_assemble_hexaboard_flags.items()]
         df_steps = pd.DataFrame(table_data, columns=["Step", "Status", "Status Changed by"])
 
-        st.write("### OGP After Assemble Hexaboard Steps Overview")
+        st.write("### OGP After Assembling Overview")
         st.table(df_steps)
 
     ogp_after_assemble_hexaboard_completed = all(flag == 'green' for flag in ogp_after_assemble_hexaboard_flags.values())
@@ -1241,7 +1242,7 @@ def OGP_After_Assemble_Hexaboard(username, module_number, sensor_id, hexboard_nu
             "Encapsolation": module_encapsolation_flags,
             "OGP After Encapsolation": ogp_after_module_encapsolation_flags,
             "Live Module Electronic Test - Fully Encapsulated": live_module_electronic_test_fully_encapsulated_flags,
-            "Final OGP": final_ogp_flags
+            "Final Electronic Test": final_ogp_flags
 
             }
         details = {
@@ -1905,10 +1906,11 @@ def OGP_After_Module_Encapsolation(username, module_number, sensor_id, hexboard_
         )
 ######################################################################################################################################
 def Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sensor_id, hexboard_number, baseplate_number, remeasurement_number, usergroup, comment, last_user):
-    col1, col2 = st.columns(2)    
-    with col1:
-        if st.button("\u2B05\uFE0FPrevious Step", key="prev_step") and st.session_state.step_index > 0:
-            navigate(-1)
+    show_navigation_buttons()
+    #col1, col2 = st.columns(2)    
+    #with col1:
+    #    if st.button("\u2B05\uFE0FPrevious Step", key="prev_step") and st.session_state.step_index > 0:
+    #        navigate(-1)
 
     previous_step_completed = all(flag == 'green' for flag in ogp_after_module_encapsolation_flags.values())
     previous_step_flag = 'green' if previous_step_completed else 'red'
@@ -1931,13 +1933,13 @@ def Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sens
                       for step, flag in live_module_electronic_test_fully_encapsulated_flags.items()]
         df_steps = pd.DataFrame(table_data, columns=["Step", "Status", "Status Changed by"])
 
-        st.write("### Live Module Electronic Test - Fully Encapsulated Steps Overview")
+        st.write("### MMTS Overview")
         st.table(df_steps)
 
     live_module_electronic_test_fully_encapsulated_completed = all(flag == 'green' for flag in live_module_electronic_test_fully_encapsulated_flags.values())
     Live_Module_Electronic_Test_Fully_Encapsulated_Flag = 'green' if live_module_electronic_test_fully_encapsulated_completed else 'red'
     Live_Module_Electronic_Test_Fully_Encapsulated_Icon = '\u2705' if Live_Module_Electronic_Test_Fully_Encapsulated_Flag == 'green' else '\u274C'
-    st.header(f"Live Module Electronic Test - Fully Encapsulated Check List: {Live_Module_Electronic_Test_Fully_Encapsulated_Icon}")
+    st.header(f"MMTS Check List: {Live_Module_Electronic_Test_Fully_Encapsulated_Icon}")
 
     if st.button("Save Flags to File"):
         all_checklists_flags = {
@@ -1970,10 +1972,10 @@ def Live_Module_Electronic_Test_Fully_Encapsulated(username, module_number, sens
         save_flags_to_file(all_checklists_flags, details,"data/output.csv",username,usergroup,comment)
         find_unfinished_modules()
 
-        subject = "MAC Production Status Change Notification: Live Module Electronic Test - Fully Encapsulated"
+        subject = "MAC Production Status Change Notification: MMTS"
         message = f"""Dear Electrical Test Team,
 
-            Please be informed that the status of the step: Live Module Electronic Test - Fully Encapsulated has changed.
+            Please be informed that the status of the step: MMTS has changed.
 
             Status: {Live_Module_Electronic_Test_Fully_Encapsulated_Icon}
             Changed by: {username}
@@ -2021,13 +2023,13 @@ def Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_num
                       for step, flag in final_ogp_flags.items()]
         df_steps = pd.DataFrame(table_data, columns=["Step", "Status", "Status Changed by"])
 
-        st.write("### Final OGP Overview")
+        st.write("### Final Electronic Test Overview")
         st.table(df_steps)
 
     final_ogp_completed = all(flag == 'green' for flag in final_ogp_flags.values())
     Final_ogp_Flag = 'green' if final_ogp_completed else 'red'
     Final_ogp_Icon = '\u2705' if Final_ogp_Flag == 'green' else '\u274C'
-    st.header(f"Final OGP Check List: {Final_ogp_Icon}")
+    st.header(f"Final Electronic Test Check List: {Final_ogp_Icon}")
 
     if st.button("Save Flags to File"):
         all_checklists_flags = {
@@ -2060,10 +2062,10 @@ def Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_num
         save_flags_to_file(all_checklists_flags, details,"data/output.csv",username,usergroup,comment)
         find_unfinished_modules()
 
-        subject = "MAC Production Status Change Notification: Final OGP before Packaging"
+        subject = "MAC Production Status Change Notification: Final Electronic Test before Packaging"
         message = f"""Dear OGP Team,
 
-            Please be informed that the status of the step: Final OGP has changed.
+            Please be informed that the status of the step: Final Electronic Test before Packaging has changed.
 
             Status: {Final_ogp_Icon}
             Changed by: {username}
@@ -2078,7 +2080,7 @@ def Final_OGP(username, module_number, sensor_id, hexboard_number, baseplate_num
             IHEP MAC Checklist Website"""
 
         send_email_notification(
-            group_name="OGP",
+            group_name="Electrical",
             subject=subject,
             message=message,
             sender_email="hgcalcn@cern.ch",
@@ -2226,7 +2228,13 @@ def show_unfinished_modules(username):
         if module_info:
             unfinished_table = pd.DataFrame(module_info)
             unfinished_table.index = range(1, len(unfinished_table) + 1)
-            st.write(unfinished_table)
+            #st.write(unfinished_table)
+            st.data_editor(
+                unfinished_table,
+                height=800,
+                use_container_width=True,
+                disabled=True  # 设为只读，不允许编辑
+            )
             st.warning("\u26A0\uFE0F Please finish those modules in the Module Assembly Check List.")
         else:
             st.info("No unfinished modules with red flags found.")
@@ -2309,7 +2317,13 @@ def show_finished_modules(username):
 
         # Display finished modules
         st.write("## Finished Modules (Ready for Packaging)")
-        st.write(finished_table)
+        #st.write(finished_table)
+        st.data_editor(
+            finished_table,
+            height=400,
+            use_container_width=True,
+            disabled=True  # 设为只读，不允许编辑
+        )
         st.success("Those modules have all steps finished. Ready for packaging. Please switch to 'Packaging Modules' tab when there are more than 20 modules finished" )
 
     except pd.errors.EmptyDataError:
@@ -2839,7 +2853,7 @@ def handle_plan_data(content=None, action="read"):
 ################################################################################################################################################    
 def home_page(username):
     st.title("CMS HGCal IHEP MAC: Module Assembly and Status Bookkeeping System")
-    st.caption("**Version:** v0.6.1 (MMTS Procedure Integrated)") 
+    st.caption("**Version:** v0.7.0 (MMTS Procedure Separated)") 
 
     st.divider()
     
